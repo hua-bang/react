@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"lint": "eslint --fix --quiet",
-		"prepare": "husky install"
+		"prepare": "husky install",
+    "build:dev": "rimraf ./dist && rollup --bundleConfigAsCjs --config ./scripts/rollup/react.config.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -15,6 +16,7 @@
 		"@commitlint/cli": "^19.5.0",
 		"@commitlint/config-conventional": "^19.5.0",
 		"@eslint/js": "^9.14.0",
+		"@rollup/plugin-commonjs": "^28.0.1",
 		"@typescript-eslint/eslint-plugin": "^8.12.2",
 		"@typescript-eslint/parser": "^8.12.2",
 		"commitlint": "^19.5.0",
@@ -24,6 +26,10 @@
 		"globals": "^15.12.0",
 		"husky": "^8.0.0",
 		"prettier": "^3.3.3",
+		"rimraf": "^6.0.1",
+		"rollup": "^4.24.4",
+		"rollup-plugin-generate-package-json": "^3.2.0",
+		"rollup-plugin-typescript2": "^0.36.0",
 		"shared": "^0.2.0",
 		"typescript-eslint": "^8.12.2"
 	},
