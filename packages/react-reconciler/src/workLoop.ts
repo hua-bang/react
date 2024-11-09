@@ -54,7 +54,9 @@ function renderRoot(fiber: FiberRootNode) {
       workLoop();
       break;
     } catch (e: any) {
-      console.log('workLoop error', e);
+      if (__DEV__) {
+        console.log('workLoop error', e);
+      }
       workInProgress = null;
     }
     // eslint-disable-next-line no-constant-condition
