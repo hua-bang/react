@@ -8,7 +8,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
   function reconcileSingleElement(
     returnFiber: FiberNode,
-    currentFiber: FiberNode | null,
+    _currentFiber: FiberNode | null,
     element: ReactElementType,
   ) {
     // 根据 element 生成 fiberNode
@@ -19,7 +19,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
   function reconcileSingleTextNode(
     returnFiber: FiberNode,
-    currentFiber: FiberNode | null,
+    _currentFiber: FiberNode | null,
     content: string | number,
   ) {
     const fiber = new FiberNode(HostText, { content }, null);

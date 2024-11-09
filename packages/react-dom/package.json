@@ -1,13 +1,17 @@
 {
-  "name": "react-reconciler",
+  "name": "react-dom",
   "version": "1.0.0",
-  "description": "react 协调器",
+  "description": "",
   "module": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "shared": "workspace:*"
+    "shared": "workspace:*",
+    "react-reconciler": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "workspace:*"
   },
   "keywords": [],
   "author": "",

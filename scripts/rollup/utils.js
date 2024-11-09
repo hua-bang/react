@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import path from 'path';
 import fs from 'fs';
 import commonjs from '@rollup/plugin-commonjs';
@@ -24,6 +25,7 @@ export function getPackageJson(pkgName) {
 export function getBaseRollupPlugins({
   alias = {
     __DEV__: true,
+    preventAssignment: true,
   },
   typescript = {},
 } = {}) {
