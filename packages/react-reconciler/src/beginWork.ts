@@ -32,7 +32,7 @@ function updateHostRoot(wip: FiberNode) {
   const pending = updateQueue.shared.pending;
   updateQueue.shared.pending = null;
 
-  const memoizedState = processUpdateQueue(baseState, pending);
+  const { memoizedState } = processUpdateQueue(baseState, pending);
   wip.memoizedState = memoizedState;
 
   const nextChildren = wip.memoizedState;

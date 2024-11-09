@@ -1,5 +1,5 @@
 import { appendChildToContainer, Container } from "hostConfig";
-import { FiberNode } from "./fiber";
+import { FiberNode, FiberRootNode } from "./fiber";
 import { MutationMask, NoFlags, Placement } from "./fiberFlags";
 import { HostComponent, HostRoot, HostText } from "./workTags";
 
@@ -27,7 +27,6 @@ export const commitMutationEffects = (finishedWork: FiberNode) => {
 
         // 没有兄弟节点, 则看父节点是否是 MutationMask
         nextEffect = nextEffect.return;
-        break;
       }
     }
   }
@@ -66,7 +65,7 @@ function getHostParent(fiber: FiberNode) {
     }
 
     if (parentTag === HostRoot) {
-      return parent.stateNode.containerInfo;
+      return (parent.stateNode as FiberRootNode).container;
     }
 
     parent = parent.return;
@@ -82,7 +81,7 @@ function getHostParent(fiber: FiberNode) {
 function appendPlacementNodeIntoContainer(finishedWork: FiberNode, hostParent: Container) {
   // fiber host 节点
   if (finishedWork.tag === HostComponent || finishedWork.tag === HostText) {
-    appendChildToContainer(finishedWork.stateNode, hostParent);
+    appendChildToContainer(hostParent, finishedWork.stateNode);
     return;
   }
 
