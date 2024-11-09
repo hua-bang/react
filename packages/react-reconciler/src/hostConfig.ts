@@ -12,3 +12,7 @@ export const appendInitialChild = (...args: any[]) => {
 export const createTextInstance = (...args: any[]): any => {
   return {};
 }
+
+export const appendChildToContainer = (...args: any[]) => {
+
+}
