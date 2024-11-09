@@ -1,6 +1,7 @@
 import { beginWork } from "./beginWork";
 import { completeWork } from "./completeWork";
-import { FiberNode } from "./fiber";
+import { createWorkInProgress, FiberNode, FiberRootNode } from "./fiber";
+import { HostRoot } from "./workTags";
 
 let workInProgress: FiberNode | null = null;
 
@@ -10,15 +11,41 @@ let workInProgress: FiberNode | null = null;
  * this node is now the current working node and will be used for the next render phase.
  * @param fiber 
  */
-function prepareFreshState(fiber: FiberNode) {
-  workInProgress = fiber;
+function prepareFreshState(fiber: FiberRootNode) {
+  workInProgress = createWorkInProgress(fiber.current, {});
+}
+
+export function scheduleUpdateOnFiber(fiber: FiberNode) {
+  // TODO: 调度
+  const root = markUpdateFromFiberToRoot(fiber);
+
+  if (!root) {
+    return;
+  }
+
+  renderRoot(root);
+}
+
+function markUpdateFromFiberToRoot(fiber: FiberNode): FiberRootNode | null {
+  let node = fiber, parent = node.return;
+
+  while (parent !== null) {
+    node = parent;
+    parent = node.return;
+  }
+
+  if (node.tag === HostRoot) {
+    return node.stateNode;
+  }
+
+  return null;
 }
 
 /**
  * renders the root fiber node.
  * @param fiber 
  */
-function renderRoot(fiber: FiberNode) {
+function renderRoot(fiber: FiberRootNode) {
   // init fiber node
   prepareFreshState(fiber);
 
@@ -30,6 +57,7 @@ function renderRoot(fiber: FiberNode) {
       console.log('workLoop error', e);
       workInProgress = null;
     }
+    // eslint-disable-next-line no-constant-condition
   } while (true)
 }
 
