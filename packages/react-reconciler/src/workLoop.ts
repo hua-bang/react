@@ -45,9 +45,9 @@ function markUpdateFromFiberToRoot(fiber: FiberNode): FiberRootNode | null {
  * renders the root fiber node.
  * @param fiber 
  */
-function renderRoot(fiber: FiberRootNode) {
+function renderRoot(root: FiberRootNode) {
   // init fiber node
-  prepareFreshState(fiber);
+  prepareFreshState(root);
 
   do {
     try {
@@ -61,6 +61,12 @@ function renderRoot(fiber: FiberRootNode) {
     }
     // eslint-disable-next-line no-constant-condition
   } while (true)
+
+  const finishedWork = root.current.alternate;
+  root.finishedWork = finishedWork;
+
+  // 提交
+  // commitRoot(root);
 }
 
 function workLoop() {
