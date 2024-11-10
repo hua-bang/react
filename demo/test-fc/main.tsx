@@ -11,7 +11,8 @@ function App() {
 function Child() {
   const [num, setNum] = useState(100);
   window.setNum = setNum;
-	return <span>{num}</span>;
+
+  return <div>{num === 3 ? 'a'+num : 'b' + num}</div>;
 }
 
 
