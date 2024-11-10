@@ -27,7 +27,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
     const key = element.key;
 
-    if (currentFiber !== null) {
+    work: if (currentFiber !== null) {
       // 注意：这块是 ReactElement 和 fiber 类型进行比较
       // key 相同
       if (key === currentFiber.key) {
@@ -41,9 +41,11 @@ function ChildReconciler(shouldTrackEffects: boolean) {
           }
           // 不能复用，走删除
           deleteChild(returnFiber, currentFiber);
+          break work;
         } else {
           if (__DEV__) {
             console.warn('未实现的类型', element);
+            break work;
           }
         }
       } else {

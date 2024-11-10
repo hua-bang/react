@@ -33,6 +33,7 @@ export function renderWithHooks(wip: FiberNode) {
 
   if (current !== null) {
     // update
+    currentDispatcher.current = HooksDispatcherOnUpdate;
   } else {
     // mount
     currentDispatcher.current = HooksDispatcherOnMount;
