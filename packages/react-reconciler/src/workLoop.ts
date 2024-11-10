@@ -79,7 +79,7 @@ function commitRoot(root: FiberRootNode) {
   }
 
   if (__DEV__) {
-    console.log('commitRoot 开始执行');
+    console.warn('commitRoot 开始执行');
   }
 
   // 重置
