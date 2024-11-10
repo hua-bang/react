@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Container = Element;
 export type Instance = Element;
+export type TextInstance = Text;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createInstance = (type: string, props: any): Instance => {
@@ -19,3 +20,11 @@ export const createTextInstance = (content: string) => {
 }
 
 export const appendChildToContainer = appendInitialChild;
+
+export function commitTextUpdate(text: TextInstance, content: string) {
+  text.textContent = content;
+}
+
+export function removeChild(child: Instance | TextInstance, container: Container) {
+  container.removeChild(child);
+}

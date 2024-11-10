@@ -24,6 +24,7 @@ export class FiberNode {
   memoizedProps: Props | null;
   memoizedState: any;
   updateQueue: unknown;
+  deletions: FiberNode[] | null;
   // 用于双缓冲
   alternate: FiberNode | null;
   // 副作用
@@ -51,6 +52,7 @@ export class FiberNode {
     this.memoizedProps = null;
     this.memoizedState = null;
     this.updateQueue = null;
+    this.deletions = null;
     this.alternate = null;
     this.flags = NoFlags;
     this.subtreeFlags = NoFlags;
@@ -87,6 +89,7 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: Props): F
     wip.pendingProps = pendingProps;
     wip.flags = NoFlags;
     wip.subtreeFlags = NoFlags;
+    wip.deletions = null;
   }
   wip.type = current.type;
   wip.updateQueue = current.updateQueue;

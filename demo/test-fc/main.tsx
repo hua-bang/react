@@ -9,7 +9,8 @@ function App() {
 	);
 }
 function Child() {
-  const [num] = useState(100);
+  const [num, setNum] = useState(100);
+  window.setNum = setNum;
 	return <span>{num}</span>;
 }
 
