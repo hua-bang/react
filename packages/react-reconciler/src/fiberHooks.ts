@@ -60,6 +60,7 @@ function mountState<State>(initial: State | (() => State)): [State, Dispatch<Sta
 
   const queue = createUpdateQueue<State>();
   hook.updateQueue = queue;
+  hook.memoizedState = memoizedState;
 
   const dispatch = dispatchSetState.bind(null, currentlyRenderingFiber!, queue as any);
   queue.dispatch = dispatch;
