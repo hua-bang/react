@@ -9,8 +9,10 @@ function App() {
 	);
 }
 function Child() {
-  const [num] = useState(100);
-	return <span>{num}</span>;
+  const [num, setNum] = useState(100);
+  window.setNum = setNum;
+
+  return <div>{num === 3 ? 'a'+num : 'b' + num}</div>;
 }
 
 

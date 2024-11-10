@@ -12,6 +12,11 @@ export default [
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
+    },
+    languageOptions: {
+      globals: {
+        jest: true,
+      },
     }
   }
 ];
