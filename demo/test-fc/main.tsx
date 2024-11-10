@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 function App() {
@@ -9,7 +9,8 @@ function App() {
 	);
 }
 function Child() {
-	return <span>big-react</span>;
+  const [num] = useState(100);
+	return <span>{num}</span>;
 }
 
 

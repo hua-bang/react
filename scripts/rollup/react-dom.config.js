@@ -5,6 +5,7 @@ import alias from '@rollup/plugin-alias';
 const {
   name,
   module,
+  peerDependencies,
 } = getPackageJson('react-dom');
 
 const pkgPath = resolvePkgPath(name);
@@ -27,6 +28,7 @@ export default [
         format: 'umd',
       },
     ],
+    external: [...Object.keys(peerDependencies)],
     plugins: [
       ...getBaseRollupPlugins(),
       alias({
