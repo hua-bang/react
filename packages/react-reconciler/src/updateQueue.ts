@@ -1,3 +1,4 @@
+import { Dispatch } from "shared/dispatch";
 import { Action } from "shared/ReactTypes";
 
 export interface Update<State> {
@@ -7,7 +8,8 @@ export interface Update<State> {
 export interface UpdateQueue<State> {
   shared: {
     pending: Update<State> | null;
-  }
+  };
+  dispatch: Dispatch<State> | null;
 }
 
 export const createUpdate = <State>(action: Action<State>): Update<State> => {
