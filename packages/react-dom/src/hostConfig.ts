@@ -1,13 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Props } from "shared/ReactTypes";
+
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const createInstance = (type: string, props: any): Instance => {
-  console.log(props);
-  // TODO: props 处理
+// DOM 实例上保存 props 的 key
+export const elementPropsKey = '__props'
+
+declare global {
+  interface Element {
+    [elementPropsKey]: Props;
+  }
+}
+
+export const createInstance = (type: string, props: Props): Instance => {
   const element = document.createElement(type);
+  updateFiberProps(element, props);
   return element;
 }
 
@@ -27,4 +35,8 @@ export function commitTextUpdate(text: TextInstance, content: string) {
 
 export function removeChild(child: Instance | TextInstance, container: Container) {
   container.removeChild(child);
+}
+
+export function updateFiberProps(node: Element, props: Props) {
+  node[elementPropsKey] = props;
 }
