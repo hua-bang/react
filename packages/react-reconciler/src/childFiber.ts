@@ -19,6 +19,20 @@ function ChildReconciler(shouldTrackEffects: boolean) {
     }
   }
 
+  function deleteRemainingChildren(
+    returnFiber: FiberNode,
+    currentFirstChild: FiberNode | null,
+  ) {
+    if (!shouldTrackEffects) {
+      return;
+    }
+    let childToDelete = currentFirstChild;
+    while (childToDelete !== null) {
+      deleteChild(returnFiber, childToDelete);
+      childToDelete = childToDelete.sibling;
+    }
+  }
+
   function reconcileSingleElement(
     returnFiber: FiberNode,
     currentFiber: FiberNode | null,
@@ -27,7 +41,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
     const key = element.key;
 
-    work: if (currentFiber !== null) {
+    while (currentFiber !== null) {
       // 注意：这块是 ReactElement 和 fiber 类型进行比较
       // key 相同
       if (key === currentFiber.key) {
@@ -37,20 +51,24 @@ function ChildReconciler(shouldTrackEffects: boolean) {
             // 可以复用
             const exist = useFiber(currentFiber, element.props);
             exist.return = returnFiber;
+            // 需要删除其他的兄弟节点
+            deleteRemainingChildren(returnFiber, currentFiber.sibling);
             return exist;
           }
-          // 不能复用，走删除
-          deleteChild(returnFiber, currentFiber);
-          break work;
+          // key 相同, type 不同 不能复用，走删除
+          deleteRemainingChildren(returnFiber, currentFiber);
+          break;
         } else {
           if (__DEV__) {
             console.warn('未实现的类型', element);
-            break work;
+            break;
           }
         }
       } else {
         // 删除
+        // 看看是不是下个兄弟能够复用
         deleteChild(returnFiber, currentFiber);
+        currentFiber = currentFiber.sibling;
       }
 
     }
@@ -66,14 +84,16 @@ function ChildReconciler(shouldTrackEffects: boolean) {
     currentFiber: FiberNode | null,
     content: string | number,
   ) {
-    if (currentFiber !== null) {
+    while (currentFiber !== null) {
       if (currentFiber.tag === HostText) {
         const existing = useFiber(currentFiber, { content });
         existing.return = returnFiber;
+        deleteRemainingChildren(returnFiber, currentFiber.sibling);
         return existing;
       } else {
         // 删除
         deleteChild(returnFiber, currentFiber);
+        currentFiber = currentFiber.sibling;
       }
     }
     const fiber = new FiberNode(HostText, { content }, null);
