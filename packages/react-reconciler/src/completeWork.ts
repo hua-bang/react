@@ -1,4 +1,4 @@
-import { appendInitialChild, Container, createInstance, createTextInstance } from "hostConfig";
+import { appendInitialChild, Container, createInstance, createTextInstance, updateFiberProps } from "hostConfig";
 import { FiberNode } from "./fiber";
 import { FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
 import { NoFlags, Update } from "./fiberFlags"
@@ -19,6 +19,7 @@ export const completeWork = (wip: FiberNode) => {
       if (current !== null && wip.stateNode) {
         // update
         // TODO: 后续实现
+        updateFiberProps(wip.stateNode, newProps);
       } else {
         // 1. 构建 DOM
         const instance = createInstance(wip.type, newProps);

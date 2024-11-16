@@ -10,9 +10,10 @@ function App() {
 }
 function Child() {
   const [num, setNum] = useState(100);
-  window.setNum = setNum;
 
-  return <div>{num === 3 ? 'a'+num : 'b' + num}</div>;
+  return <div onClick={() => {
+    setNum(num + 1);
+  }}>{num === 3 ? 'a'+num : 'b' + num}</div>;
 }
 
 
