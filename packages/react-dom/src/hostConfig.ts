@@ -40,3 +40,11 @@ export function removeChild(child: Instance | TextInstance, container: Container
 export function updateFiberProps(node: Element, props: Props) {
   node[elementPropsKey] = props;
 }
+
+export function insertChildToContainer(
+  child: Instance,
+  container: Container,
+  before: Instance
+) {
+  container.insertBefore(child, before);
+}
