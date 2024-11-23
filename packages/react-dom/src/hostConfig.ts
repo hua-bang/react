@@ -48,3 +48,18 @@ export function insertChildToContainer(
 ) {
   container.insertBefore(child, before);
 }
+
+
+const getScheduleMicroTaskManager = () => {
+  if (typeof queueMicrotask === 'function') {
+    return queueMicrotask;
+  }
+
+  if (typeof Promise === 'function') {
+    return (callback: (...args: any[]) => void) => Promise.resolve(null).then(callback);
+  }
+
+  return setTimeout;
+}
+
+export const scheduleMicroTask = getScheduleMicroTaskManager();
