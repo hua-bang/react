@@ -1,6 +1,6 @@
 import { appendInitialChild, Container, createInstance, createTextInstance, updateFiberProps } from "hostConfig";
 import { FiberNode } from "./fiber";
-import { FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
+import { Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
 import { NoFlags, Update } from "./fiberFlags"
 
 function markUpdate(fiber: FiberNode) {
@@ -50,6 +50,9 @@ export const completeWork = (wip: FiberNode) => {
       bubbleProperties(wip);
       return null;
     case FunctionComponent:
+      bubbleProperties(wip);
+      return null;
+    case Fragment:
       bubbleProperties(wip);
       return null;
     default:

@@ -1,3 +1,3 @@
-import { jsxDEV } from "./src/jsx";
+import { jsxDEV, Fragment } from "./src/jsx";
 
-export { jsxDEV };
+export { jsxDEV, Fragment };
