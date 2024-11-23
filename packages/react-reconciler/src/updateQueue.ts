@@ -1,8 +1,10 @@
 import { Dispatch } from "shared/dispatch";
 import { Action } from "shared/ReactTypes";
+import { Lane } from "./fiberLanes";
 
 export interface Update<State> {
   action: Action<State>;
+  lane: Lane;
 }
 
 export interface UpdateQueue<State> {
@@ -12,9 +14,10 @@ export interface UpdateQueue<State> {
   dispatch: Dispatch<State> | null;
 }
 
-export const createUpdate = <State>(action: Action<State>): Update<State> => {
+export const createUpdate = <State>(action: Action<State>, lane: Lane): Update<State> => {
   return {
     action,
+    lane,
   };
 }
 
@@ -35,7 +38,8 @@ export const enqueueUpdate = <State>(
 
 export const processUpdateQueue = <State>(
   baseState: State,
-  pendingUpdate: Update<State> | null
+  pendingUpdate: Update<State> | null,
+  renderLane: Lane,
 ): { memoizedState: State } => {
 
   const result: ReturnType<typeof processUpdateQueue<State>> = {
