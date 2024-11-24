@@ -4,6 +4,7 @@ import { Fragment, FunctionComponent, HostComponent, WorkTag } from "./workTags"
 import { FiberFlags, NoFlags } from "./fiberFlags";
 import { Container } from "hostConfig";
 import { Lane, Lanes, NoLane, NoLanes } from "./fiberLanes";
+import { Effect } from "./fiberHooks";
 
 export class FiberNode {
   // 实例
@@ -60,6 +61,11 @@ export class FiberNode {
   }
 }
 
+export interface PendingPassiveEffects {
+  unmount: Effect[];
+  update: Effect[];
+}
+
 export class FiberRootNode {
   container: Container;
 
@@ -68,6 +74,7 @@ export class FiberRootNode {
   finishedWork: FiberNode | null;
   pendingLanes: Lanes;
   finishedLane: Lane;
+  pendingPassiveEffects: PendingPassiveEffects;
 
   constructor(container: Container, hostRootFiber: FiberNode) {
     this.container = container;
@@ -76,6 +83,10 @@ export class FiberRootNode {
     this.finishedWork = null;
     this.pendingLanes = NoLanes;
     this.finishedLane = NoLane;
+    this.pendingPassiveEffects = {
+      unmount: [],
+      update: [],
+    }
   }
 }
 

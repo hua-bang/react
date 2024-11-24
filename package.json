@@ -8,7 +8,7 @@
 		"prepare": "husky install",
 		"build:dev": "rimraf ./dist && rollup --bundleConfigAsCjs --config ./scripts/rollup/dev.config.js",
 		"demo": "vite ./demo/test-fc --config ./scripts/vite/vite.config.js",
-    "test": "jest --config ./scripts/jest/jest.config.js"
+		"test": "jest --config ./scripts/jest/jest.config.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -24,6 +24,7 @@
 		"@rollup/plugin-commonjs": "^28.0.1",
 		"@types/react": "^18.0.24",
 		"@types/react-dom": "^18.0.8",
+		"@types/scheduler": "^0.23.0",
 		"@typescript-eslint/eslint-plugin": "^8.12.2",
 		"@typescript-eslint/parser": "^8.12.2",
 		"@vitejs/plugin-react": "^2.2.0",
@@ -50,6 +51,7 @@
 		"*.{js,jsx,ts,tsx}": "pnpm lint"
 	},
 	"dependencies": {
-		"@rollup/plugin-replace": "^6.0.1"
+		"@rollup/plugin-replace": "^6.0.1",
+		"scheduler": "^0.23.2"
 	}
 }
