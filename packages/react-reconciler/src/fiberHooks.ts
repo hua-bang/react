@@ -6,6 +6,8 @@ import { createUpdate, createUpdateQueue, enqueueUpdate, processUpdateQueue, Upd
 import { Action } from 'shared/ReactTypes';
 import { scheduleUpdateOnFiber } from './workLoop';
 import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
+import { FiberFlags, PassiveEffect } from './fiberFlags';
+import { HookHasEffect, Passive } from './hookEffectTags';
 
 interface Hook {
   memoizedState: any;
@@ -25,6 +27,21 @@ let renderLane: Lane = NoLane;
 const {
   currentDispatcher,
 } = internals;
+
+export interface Effect {
+  tag: FiberFlags;
+  create: EffectCallback | void;
+  destroy: EffectCallback | void;
+  deps: Deps;
+  next: Effect | null;
+}
+
+export interface FCUpdateQueue<State> extends UpdateQueue<State> {
+  lastEffect: Effect | null;
+}
+
+type EffectCallback = () => void;
+type Deps = Array<any> | null;
 
 export function renderWithHooks(wip: FiberNode, lane: Lane) {
 
@@ -54,6 +71,7 @@ export function renderWithHooks(wip: FiberNode, lane: Lane) {
 
 const HooksDispatcherOnMount = {
   useState: mountState,
+  useEffect: mountEffect,
 };
 
 const HooksDispatcherOnUpdate = {
@@ -176,4 +194,63 @@ function updateWorkInProgressHook(): Hook {
   }
 
   return workInProgressHook;
+}
+
+function mountEffect(create: EffectCallback, deps: Deps | null) {
+  const hook = mountWorkInProgressHook();
+  const nextDeps = deps === null ? null : deps;
+
+  if (currentlyRenderingFiber !== null) {
+    currentlyRenderingFiber.flags |= PassiveEffect;
+  }
+
+  // 本次是需要更新的
+  hook.memoizedState = pushEffect(Passive | HookHasEffect, create, undefined, nextDeps);
+
+}
+
+function pushEffect(
+  hookFlags: FiberFlags,
+  create: EffectCallback | void,
+  destroy: EffectCallback | void,
+  deps: Deps,
+): Effect {
+  const effect: Effect = {
+    tag: hookFlags,
+    create,
+    destroy,
+    deps,
+    next: null,
+  };
+
+  const fiber = currentlyRenderingFiber;
+  const updateQueue = fiber?.updateQueue as FCUpdateQueue<any>;
+
+  if (updateQueue === null) {
+    const updateQueue = createFCUpdateQueue();
+    fiber!.updateQueue = updateQueue;
+    // 首个的话，要构造环状链表，需要指向自己
+    effect.next = effect;
+    updateQueue.lastEffect = effect;
+  } else {
+    // 如果不是的话
+    const lastEffect = updateQueue.lastEffect;
+    if (lastEffect === null) {
+      effect.next = effect;
+      updateQueue.lastEffect = effect;
+    } else {
+      const firstEffect = lastEffect.next;
+      lastEffect.next = effect;
+      effect.next = firstEffect;
+      updateQueue.lastEffect = effect;
+    }
+  }
+
+  return effect;
+};
+
+function createFCUpdateQueue<State>(): FCUpdateQueue<State> {
+  const updateQueue = createUpdateQueue<State>() as FCUpdateQueue<State>;
+  updateQueue.lastEffect = null;
+  return updateQueue;
 }
