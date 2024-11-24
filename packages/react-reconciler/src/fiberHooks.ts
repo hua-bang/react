@@ -6,6 +6,8 @@ import { createUpdate, createUpdateQueue, enqueueUpdate, processUpdateQueue, Upd
 import { Action } from 'shared/ReactTypes';
 import { scheduleUpdateOnFiber } from './workLoop';
 import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
+import { FiberFlags, PassiveEffect } from './fiberFlags';
+import { HookHasEffect, Passive } from './hookEffectTags';
 
 interface Hook {
   memoizedState: any;
@@ -26,11 +28,27 @@ const {
   currentDispatcher,
 } = internals;
 
+export interface Effect {
+  tag: FiberFlags;
+  create: EffectCallback | void;
+  destroy: EffectCallback | void;
+  deps: Deps;
+  next: Effect | null;
+}
+
+export interface FCUpdateQueue<State> extends UpdateQueue<State> {
+  lastEffect: Effect | null;
+}
+
+type EffectCallback = () => void;
+type Deps = Array<any> | null;
+
 export function renderWithHooks(wip: FiberNode, lane: Lane) {
 
   // 赋值操作
   currentlyRenderingFiber = wip;
   wip.memoizedState = null;
+  wip.updateQueue = null;
   renderLane = lane;
 
   const current = wip.alternate;
@@ -54,10 +72,12 @@ export function renderWithHooks(wip: FiberNode, lane: Lane) {
 
 const HooksDispatcherOnMount = {
   useState: mountState,
+  useEffect: mountEffect,
 };
 
 const HooksDispatcherOnUpdate = {
   useState: updateState,
+  useEffect: updateEffect,
 };
 
 function mountState<State>(initial: State | (() => State)): [State, Dispatch<State>] {
@@ -176,4 +196,105 @@ function updateWorkInProgressHook(): Hook {
   }
 
   return workInProgressHook;
+}
+
+function mountEffect(create: EffectCallback, deps: Deps | null) {
+  const hook = mountWorkInProgressHook();
+  const nextDeps = deps === null ? null : deps;
+
+  if (currentlyRenderingFiber !== null) {
+    currentlyRenderingFiber.flags |= PassiveEffect;
+  }
+
+  // 本次是需要更新的
+  hook.memoizedState = pushEffect(Passive | HookHasEffect, create, undefined, nextDeps);
+
+}
+
+function updateEffect(create: EffectCallback | void, deps: Deps | void) {
+  const hook = updateWorkInProgressHook();
+  const nextDeps = deps === undefined ? null : deps;
+  let destroy: EffectCallback | void;
+  if (currentHook !== null) {
+    const prevEffect = currentHook.memoizedState as Effect;
+    destroy = prevEffect.destroy;
+    if (nextDeps !== null) {
+      const prevDeps = prevEffect.deps;
+      if (areHookInputsEqual(nextDeps, prevDeps)) {
+        // 浅比较依赖， 如果相等
+        hook.memoizedState = pushEffect(Passive, create, destroy, nextDeps);
+        return;
+      }
+
+      // 不相等，执行
+      (currentlyRenderingFiber as FiberNode).flags |= PassiveEffect;
+      hook.memoizedState = pushEffect(
+        Passive | HookHasEffect,
+        create,
+        destroy,
+        nextDeps
+      )
+    }
+  }
+}
+
+function areHookInputsEqual(nextDeps: Deps, prevDeps: Deps) {
+  if (prevDeps === null || nextDeps === null) {
+    return false;
+  } else {
+    for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+      if (Object.is(prevDeps[i], nextDeps[i])) {
+        continue;
+      }
+      return false;
+    }
+    return true;
+
+  }
+}
+
+function pushEffect(
+  hookFlags: FiberFlags,
+  create: EffectCallback | void,
+  destroy: EffectCallback | void,
+  deps: Deps,
+): Effect {
+  const effect: Effect = {
+    tag: hookFlags,
+    create,
+    destroy,
+    deps,
+    next: null,
+  };
+
+  const fiber = currentlyRenderingFiber;
+  const updateQueue = fiber?.updateQueue as FCUpdateQueue<any>;
+
+  if (updateQueue === null) {
+    const updateQueue = createFCUpdateQueue();
+    fiber!.updateQueue = updateQueue;
+    // 首个的话，要构造环状链表，需要指向自己
+    effect.next = effect;
+    updateQueue.lastEffect = effect;
+  } else {
+    // 如果不是的话
+    const lastEffect = updateQueue.lastEffect;
+    if (lastEffect === null) {
+      effect.next = effect;
+      updateQueue.lastEffect = effect;
+    } else {
+      const firstEffect = lastEffect.next;
+      lastEffect.next = effect;
+      effect.next = firstEffect;
+      updateQueue.lastEffect = effect;
+    }
+  }
+
+  return effect;
+};
+
+function createFCUpdateQueue<State>(): FCUpdateQueue<State> {
+  const updateQueue = createUpdateQueue<State>() as FCUpdateQueue<State>;
+  updateQueue.lastEffect = null;
+  return updateQueue;
 }
