@@ -66,7 +66,9 @@ export function renderWithHooks(wip: FiberNode, lane: Lane) {
 
   // 重置操作
   currentlyRenderingFiber = null;
+  workInProgressHook = null;
   renderLane = NoLane;
+  currentHook = null;
   return children;
 }
 
