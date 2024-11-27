@@ -2,20 +2,20 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 function App() {
-	const [num, updateNum] = useState(0);
+	const [visible, setVisible] = useState(false);
 	useEffect(() => {
 		console.log('App mount');
 	}, []);
 	useEffect(() => {
-		console.log('num change create', num);
+		console.log('num change create', visible);
 		return () => {
-			console.log('num change destroy', num);
+			console.log('num change destroy', visible);
 		};
-	}, [num]);
+	}, [visible]);
 
 	return (
-		<div onClick={() => updateNum(num + 1)}>
-			{num === 0 ? <Child /> : 'noop'}
+		<div onClick={() => setVisible(prev => !prev)}>
+			{visible ? <Child /> : 'noop'}
 		</div>
 	);
 }
