@@ -1,3 +1,5 @@
+import { HostComponent, HostText } from 'react-reconciler/src/workTags';
+import { FiberNode } from "react-reconciler/src/fiber";
 import { Props } from "shared/ReactTypes";
 
 export type Container = Element;
@@ -31,6 +33,22 @@ export const appendChildToContainer = appendInitialChild;
 
 export function commitTextUpdate(text: TextInstance, content: string) {
   text.textContent = content;
+}
+
+export const commitUpdate = (fiber: FiberNode) => {
+  switch (fiber.tag) {
+    case HostText:
+      {
+        const text = fiber.memoizedProps.content;
+        return commitTextUpdate(fiber.stateNode, text);
+      }
+    case HostComponent:
+      return updateFiberProps(fiber.stateNode, fiber.memoizedProps);
+    default:
+      if (__DEV__) {
+        console.warn('未实现的类型', fiber);
+      }
+  }
 }
 
 export function removeChild(child: Instance | TextInstance, container: Container) {

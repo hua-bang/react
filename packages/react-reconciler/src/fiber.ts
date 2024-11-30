@@ -6,6 +6,7 @@ import { Container } from "hostConfig";
 import { Lane, Lanes, NoLane, NoLanes } from "./fiberLanes";
 import { Effect } from "./fiberHooks";
 
+
 export class FiberNode {
   // 实例
   type: any;

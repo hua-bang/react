@@ -1,4 +1,4 @@
-import { appendChildToContainer, commitTextUpdate, Container, insertChildToContainer, Instance, removeChild } from "hostConfig";
+import { appendChildToContainer, commitUpdate, Container, insertChildToContainer, Instance, removeChild } from "hostConfig";
 import { FiberNode, FiberRootNode, PendingPassiveEffects } from "./fiber";
 import { ChildDeletion, FiberFlags, MutationMask, NoFlags, PassiveEffect, PassiveMask, Placement, Update } from "./fiberFlags";
 import { FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
@@ -253,20 +253,6 @@ function insertOrAppendPlacementNodeIntoContainer(finishedWork: FiberNode, hostP
       insertOrAppendPlacementNodeIntoContainer(sibling, hostParent);
       sibling = sibling.sibling;
     }
-  }
-}
-
-const commitUpdate = (fiber: FiberNode) => {
-  switch (fiber.tag) {
-    case HostText:
-      {
-        const text = fiber.memoizedProps.content;
-        return commitTextUpdate(fiber.stateNode, text);
-      }
-    default:
-      if (__DEV__) {
-        console.warn('未实现的类型', fiber);
-      }
   }
 }
 

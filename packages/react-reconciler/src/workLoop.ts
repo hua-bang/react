@@ -1,9 +1,8 @@
-import { PendingPassiveEffects } from './../../react-dom/node_modules/react-reconciler/src/fiber';
 import { scheduleMicroTask } from "hostConfig";
 import { beginWork } from "./beginWork";
 import { commitHookEffectListCreate, commitHookEffectListDestroy, commitHookEffectListUnmount, commitMutationEffects } from "./commitWork";
 import { completeWork } from "./completeWork";
-import { createWorkInProgress, FiberNode, FiberRootNode } from "./fiber";
+import { createWorkInProgress, FiberNode, FiberRootNode, PendingPassiveEffects } from "./fiber";
 import { MutationMask, NoFlags, PassiveEffect } from "./fiberFlags";
 import { getHighestPriorityLane, Lane, markRootFinished, mergeLanes, NoLane, SyncLane } from "./fiberLanes";
 import { flushSyncCallbacks, scheduleSyncCallback } from "./syncTaskQueue";
