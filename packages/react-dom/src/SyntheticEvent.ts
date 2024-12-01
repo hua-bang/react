@@ -1,4 +1,5 @@
 import { Container, elementPropsKey } from "hostConfig";
+import { unstable_ImmediatePriority, unstable_NormalPriority, unstable_runWithPriority, unstable_UserBlockingPriority } from "scheduler";
 const validEventTypeList = ['click'];
 
 type EventCallback = (e: Event) => void;
@@ -65,7 +66,9 @@ const dispatchEvent = (container: Container, eventType: string, e: Event) => {
  */
 function triggerEventFlow(paths: EventCallback[], se: SyntheticEvent) {
   paths.forEach((callback) => {
-    callback.call(null, se);
+    unstable_runWithPriority(eventTypeToSchedulerPriority(se.type), () => {
+      callback.call(null, se);
+    });
   })
 }
 
@@ -114,4 +117,17 @@ const collectPaths = (targetElement: Element, Container: Container, eventType: s
   }
 
   return paths;
+}
+
+function eventTypeToSchedulerPriority(eventType: string) {
+  switch (eventType) {
+    case 'click':
+    case 'keydown':
+    case 'keyup':
+      return unstable_ImmediatePriority;
+    case 'scroll':
+      return unstable_UserBlockingPriority;
+    default:
+      return unstable_NormalPriority;
+  }
 }
