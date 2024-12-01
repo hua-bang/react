@@ -1,4 +1,4 @@
-import { Container, elementPropsKey } from "hostConfig";
+import { Container, elementPropsKey } from "./hostConfig";
 import { unstable_ImmediatePriority, unstable_NormalPriority, unstable_runWithPriority, unstable_UserBlockingPriority } from "scheduler";
 const validEventTypeList = ['click'];
 

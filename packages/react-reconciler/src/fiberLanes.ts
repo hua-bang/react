@@ -64,3 +64,7 @@ export function schedulerPriorityToLane(schedulerPriority: number) {
 
   return IdleLane;
 };
+
+export function isSubsetOfLanes(set: Lanes, subset: Lane) {
+  return (set & subset) === subset;
+}
