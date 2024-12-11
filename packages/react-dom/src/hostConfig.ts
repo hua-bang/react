@@ -60,8 +60,8 @@ export function updateFiberProps(node: Element, props: Props) {
 }
 
 export function insertChildToContainer(
-  child: Instance,
   container: Container,
+  child: Instance,
   before: Instance
 ) {
   container.insertBefore(child, before);
