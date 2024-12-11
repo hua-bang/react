@@ -8,6 +8,6 @@ const PostsTab = function PostsTab() {
 function SlowPost({ index }) {
 	const startTime = performance.now();
 	while (performance.now() - startTime < 4) {}
-	return <li className="item">博文 #{index + 1}</li>;
+	return <li>{index}</li>;
 }
 export default PostsTab;
