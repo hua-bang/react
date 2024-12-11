@@ -6,13 +6,13 @@ import PostsTab from './PostsTab';
 import ContactTab from './ContactTab';
 import './style.css';
 function App() {
-	// const [isPending, startTransition] = useTransition();
+	const [isPending, startTransition] = useTransition();
 	const [tab, setTab] = useState('about');
 	console.log('hello');
 	function selectTab(nextTab) {
-		// startTransition(() => {
+		startTransition(() => {
 			setTab(nextTab);
-		// });
+		});
 	}
 	return (
 		<>

@@ -1,4 +1,5 @@
 import currentDispatcher, { resolveDispatcher } from "./src/currentDispatcher";
+import currentBatchConfig from './src/currentBatchConfig';
 import { Dispatcher } from 'shared/dispatch';
 import { jsx, isValidElement as isValidElementFn } from "./src/jsx";
 
@@ -12,10 +13,16 @@ export const useEffect: Dispatcher['useEffect'] = (callback, deps) => {
   return dispatcher.useEffect(callback, deps);
 };
 
+export const useTransition: Dispatcher['useTransition'] = () => {
+  const dispatcher = resolveDispatcher();
+  return dispatcher.useTransition();
+};
+
 
 // 内部数据共享层
 export const __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = {
   currentDispatcher,
+  currentBatchConfig,
 };
 
 export const version = '0.0.0';
