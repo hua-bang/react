@@ -1,8 +1,8 @@
+import currentBatchConfig from 'react/src/currentBatchConfig';
 
 import internals from 'shared/internals';
 import { FiberNode } from "./fiber";
 import { Dispatch, Dispatcher } from 'shared/dispatch';
-import currentBatchConfig from 'react/src/currentBatchConfig';
 import { createUpdate, createUpdateQueue, enqueueUpdate, processUpdateQueue, Update, UpdateQueue } from './updateQueue';
 import { Action } from 'shared/ReactTypes';
 import { scheduleUpdateOnFiber } from './workLoop';
