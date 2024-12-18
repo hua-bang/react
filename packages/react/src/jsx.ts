@@ -1,7 +1,7 @@
 import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols';
 import { Type, Key, Ref, Props, ReactElementType, ElementType } from 'shared/ReactTypes';
 
-export const ReactElement = (type: Type, key: Key, ref: Ref, props: Props): ReactElementType => {
+export const ReactElement = (type: Type, key: Key, ref: Ref | null, props: Props): ReactElementType => {
   const element = {
     $$typeof: REACT_ELEMENT_TYPE,
     type,
@@ -16,7 +16,7 @@ export const ReactElement = (type: Type, key: Key, ref: Ref, props: Props): Reac
 
 export const jsx = (type: ElementType, config: Record<string, any>, ...maybeChild: any[]) => {
   let key: Key = null;
-  let ref: Ref = null;
+  let ref: Ref | null = null;
   const props: Props = {};
 
   for (const prop in config) {
@@ -55,7 +55,7 @@ export const jsx = (type: ElementType, config: Record<string, any>, ...maybeChil
 
 export const jsxDEV = (type: ElementType, config: Record<string, any>) => {
   let key: Key = null;
-  let ref: Ref = null;
+  let ref: Ref | null = null;
   const props: Props = {};
 
   for (const prop in config) {

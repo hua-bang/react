@@ -1,8 +1,8 @@
+import currentBatchConfig from 'react/src/currentBatchConfig';
 
 import internals from 'shared/internals';
 import { FiberNode } from "./fiber";
 import { Dispatch, Dispatcher } from 'shared/dispatch';
-import currentBatchConfig from 'react/src/currentBatchConfig';
 import { createUpdate, createUpdateQueue, enqueueUpdate, processUpdateQueue, Update, UpdateQueue } from './updateQueue';
 import { Action } from 'shared/ReactTypes';
 import { scheduleUpdateOnFiber } from './workLoop';
@@ -361,15 +361,29 @@ function startTransition(setPending: Dispatch<boolean>, callback: () => void) {
   currentBatchConfig.transition = prevTransition;
 };
 
+const mountRef = <T>(initialValue: T) => {
+  const hook = mountWorkInProgressHook();
+  hook.memoizedState = { current: initialValue };
+  return hook.memoizedState;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const updateRef = <T>(_: T) => {
+  const hook = updateWorkInProgressHook();
+  return hook.memoizedState;
+}
+
 
 const HooksDispatcherOnMount = {
   useState: mountState,
   useEffect: mountEffect,
   useTransition: mountTransition,
+  useRef: mountRef,
 };
 
 const HooksDispatcherOnUpdate = {
   useState: updateState,
   useEffect: updateEffect,
   useTransition: updateTransition,
+  useRef: updateRef,
 };

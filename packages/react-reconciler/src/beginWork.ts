@@ -5,6 +5,7 @@ import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import { renderWithHooks } from './fiberHooks';
 import { Lane } from './fiberLanes';
+import { Ref } from './fiberFlags';
 
 export const beginWork = (wip: FiberNode, renderLane: Lane): FiberNode | null => {
   switch (wip.tag) {
@@ -47,6 +48,7 @@ function updateHostComponent(wip: FiberNode) {
   const nextProps = wip.pendingProps;
   const nextChildren = nextProps.children;
 
+  markRef(wip.alternate, wip);
   reconcileChildren(wip, nextChildren);
   return wip.child;
 }
@@ -75,4 +77,15 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
   }
 
   return wip.child;
+}
+
+function markRef(current: FiberNode | null, workInProgress: FiberNode) {
+  const ref = workInProgress.ref;
+
+  if (
+    (current === null && ref !== null) ||
+    (current !== null && current.ref !== ref)
+  ) {
+    workInProgress.flags |= Ref;
+  }
 }
