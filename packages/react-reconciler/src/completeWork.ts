@@ -1,7 +1,8 @@
 import { appendInitialChild, Container, createInstance, createTextInstance, Instance } from "hostConfig";
 import { FiberNode } from "./fiber";
-import { Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
+import { ContextProvider, Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
 import { NoFlags, Ref, Update } from "./fiberFlags"
+import { popProvider } from "./fiberContext";
 
 function markRef(fiber: FiberNode) {
   fiber.flags |= Ref;
@@ -14,6 +15,9 @@ function markUpdate(fiber: FiberNode) {
 // - 对于`Host`类型`fiberNode`：构建离屏DOM树
 // - 标记Update flag（TODO）
 export const completeWork = (wip: FiberNode) => {
+  if (__DEV__) {
+    console.warn('completeWork ', wip.tag, wip.type, wip);
+  }
   // 递归中的归
   const newProps = wip.pendingProps;
   const current = wip.alternate;
@@ -39,6 +43,12 @@ export const completeWork = (wip: FiberNode) => {
       }
       bubbleProperties(wip);
       return null;
+    case ContextProvider: {
+      const context = wip.type._context;
+      popProvider(context);
+      bubbleProperties(wip);
+      return null;
+    }
     case HostText:
       if (current !== null && wip.stateNode !== null) {
         // update

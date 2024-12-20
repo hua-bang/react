@@ -1,3 +1,4 @@
+import { Context } from "./context";
 import { Action } from "./ReactTypes";
 
 export interface Dispatcher {
@@ -5,6 +6,7 @@ export interface Dispatcher {
   useEffect: (callback: () => void, deps: Array<any> | void) => void;
   useTransition: () => [boolean, (callback: () => void) => void];
   useRef: <T>(initialValue: T) => { current: T };
+  useContext: <T>(context: Context<T>) => T;
 }
 
 export type Dispatch<State> = (action: Action<State>) => void;

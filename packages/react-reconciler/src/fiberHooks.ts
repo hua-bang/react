@@ -9,6 +9,7 @@ import { scheduleUpdateOnFiber } from './workLoop';
 import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
 import { FiberFlags, PassiveEffect } from './fiberFlags';
 import { HookHasEffect, Passive } from './hookEffectTags';
+import { Context } from 'shared/context';
 
 interface Hook {
   memoizedState: any;
@@ -373,12 +374,22 @@ const updateRef = <T>(_: T) => {
   return hook.memoizedState;
 }
 
+const readContext = <T>(context: Context<T>): T => {
+  const consumer = currentlyRenderingFiber;
+  if (consumer === null) {
+    throw new Error('只能在函数组件内调用useContext');
+  }
+
+  return context._currentValue;
+}
+
 
 const HooksDispatcherOnMount = {
   useState: mountState,
   useEffect: mountEffect,
   useTransition: mountTransition,
   useRef: mountRef,
+  useContext: readContext
 };
 
 const HooksDispatcherOnUpdate = {
@@ -386,4 +397,5 @@ const HooksDispatcherOnUpdate = {
   useEffect: updateEffect,
   useTransition: updateTransition,
   useRef: updateRef,
+  useContext: readContext
 };
