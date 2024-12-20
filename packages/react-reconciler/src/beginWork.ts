@@ -1,4 +1,4 @@
-import { Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from './workTags';
+import { ContextProvider, Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from './workTags';
 import { FiberNode } from "./fiber";
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
@@ -6,8 +6,12 @@ import { mountChildFibers, reconcileChildFibers } from './childFiber';
 import { renderWithHooks } from './fiberHooks';
 import { Lane } from './fiberLanes';
 import { Ref } from './fiberFlags';
+import { pushProvider } from './fiberContext';
 
 export const beginWork = (wip: FiberNode, renderLane: Lane): FiberNode | null => {
+  if (__DEV__) {
+    console.warn('beginWork ', wip.tag, wip.type, wip);
+  }
   switch (wip.tag) {
     case HostRoot:
       return updateHostRoot(wip, renderLane);
@@ -15,6 +19,8 @@ export const beginWork = (wip: FiberNode, renderLane: Lane): FiberNode | null =>
       return updateHostComponent(wip);
     case HostText:
       return null;
+    case ContextProvider:
+      return updateContextProvider(wip);
     case FunctionComponent:
       return updateFunctionComponent(wip, renderLane);
     case Fragment:
@@ -76,6 +82,18 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
     wip.child = mountChildFibers(wip, null, children);
   }
 
+  return wip.child;
+}
+
+function updateContextProvider(wip: FiberNode) {
+  const providerType = wip.type;
+  const context = providerType._context;
+  const newProps = wip.pendingProps;
+
+  pushProvider(context, newProps.value);
+
+  const nextChildren = newProps.children;
+  reconcileChildren(wip, nextChildren);
   return wip.child;
 }
 

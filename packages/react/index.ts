@@ -2,6 +2,7 @@ import currentDispatcher, { resolveDispatcher } from "./src/currentDispatcher";
 import currentBatchConfig from './src/currentBatchConfig';
 import { Dispatcher } from 'shared/dispatch';
 import { jsx, isValidElement as isValidElementFn } from "./src/jsx";
+export { createContext } from './src/context';
 
 export const useState: Dispatcher['useState'] = (initialState) => {
   const dispatcher = resolveDispatcher();
@@ -21,6 +22,11 @@ export const useTransition: Dispatcher['useTransition'] = () => {
 export const useRef: Dispatcher['useRef'] = (initialValue) => {
   const dispatcher = resolveDispatcher();
   return dispatcher.useRef(initialValue);
+}
+
+export const useContext: Dispatcher['useContext'] = (context) => {
+  const dispatcher = resolveDispatcher();
+  return dispatcher.useContext(context);
 }
 
 
