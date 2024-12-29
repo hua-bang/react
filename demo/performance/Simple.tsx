@@ -5,10 +5,10 @@ export default function App() {
 	return (
 		<div
 			onClick={() => {
-				update(num => num + 1);
+				update(1);
 			}}
 		>
-			{num}
+			<Cpn />
 		</div>
 	);
 }

@@ -6,10 +6,11 @@ import { Dispatch, Dispatcher } from 'shared/dispatch';
 import { createUpdate, createUpdateQueue, enqueueUpdate, processUpdateQueue, Update, UpdateQueue } from './updateQueue';
 import { Action } from 'shared/ReactTypes';
 import { scheduleUpdateOnFiber } from './workLoop';
-import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
+import { Lane, mergeLanes, NoLane, removeLanes, requestUpdateLane } from './fiberLanes';
 import { FiberFlags, PassiveEffect } from './fiberFlags';
 import { HookHasEffect, Passive } from './hookEffectTags';
 import { Context } from 'shared/context';
+import { markWipeReceivedUpdate } from './beginWork';
 
 interface Hook {
   memoizedState: any;
@@ -105,7 +106,7 @@ function dispatchSetState<State>(
 ) {
   const lane = requestUpdateLane();
   const update = createUpdate<State>(action, lane);
-  enqueueUpdate(queue, update);
+  enqueueUpdate(queue, update, fiber, lane);
   scheduleUpdateOnFiber(fiber, lane);
 }
 
@@ -167,11 +168,21 @@ function updateState<State>(): [State, Dispatch<State>] {
   }
 
   if (baseQueue !== null) {
+    const prevState = hook.memoizedState;
     const {
       memoizedState,
       baseQueue: newBaseQueue,
       baseState: newBaseState
-    } = processUpdateQueue(baseState, baseQueue, renderLane);
+    } = processUpdateQueue(baseState, baseQueue, renderLane, (update) => {
+      const skippedLane = update.lane;
+      const fiber = currentlyRenderingFiber as FiberNode;
+      fiber.lanes = mergeLanes(fiber.lanes, skippedLane);
+    });
+
+    if (!Object.is(prevState, memoizedState)) {
+      markWipeReceivedUpdate();
+    }
+
     hook.memoizedState = memoizedState;
     hook.baseState = newBaseState;
     hook.baseQueue = newBaseQueue;
@@ -399,3 +410,13 @@ const HooksDispatcherOnUpdate = {
   useRef: updateRef,
   useContext: readContext
 };
+
+export function bailoutHook(wip: FiberNode, renderLane: Lane) {
+  const current = wip.alternate;
+  wip.updateQueue = current?.updateQueue;
+  wip.flags &= ~PassiveEffect;
+
+  if (current) {
+    current.lanes = removeLanes(current.lanes, renderLane);
+  }
+}

@@ -34,7 +34,8 @@ export class FiberNode {
   alternate: FiberNode | null;
 
   // 调度
-  lanes = NoLane;
+  lanes: Lanes;
+  childLanes: Lanes;
 
   // 副作用
   flags: FiberFlags;
@@ -65,6 +66,9 @@ export class FiberNode {
     this.alternate = null;
     this.flags = NoFlags;
     this.subtreeFlags = NoFlags;
+
+    this.lanes = NoLane;
+    this.childLanes = NoLanes;
   }
 }
 
@@ -126,7 +130,9 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: Props): F
   wip.memoizedProps = current.memoizedProps;
   wip.memoizedState = current.memoizedState;
   wip.ref = current.ref;
+
   wip.lanes = current.lanes;
+  wip.childLanes = current.childLanes;
 
   return wip;
 }
