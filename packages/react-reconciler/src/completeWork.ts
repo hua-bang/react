@@ -3,6 +3,7 @@ import { FiberNode } from "./fiber";
 import { ContextProvider, Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
 import { NoFlags, Ref, Update } from "./fiberFlags"
 import { popProvider } from "./fiberContext";
+import { mergeLanes, NoLanes } from "./fiberLanes";
 
 function markRef(fiber: FiberNode) {
   fiber.flags |= Ref;
@@ -124,8 +125,8 @@ function appendAllChildren(parent: Container | Instance, wip: FiberNode) {
 
 export function bubbleProperties(wip: FiberNode) {
   let subtreeFlags = NoFlags;
-
   let child = wip.child;
+  let newChildLanes = NoLanes;
 
   while (child !== null) {
     // 1. 收集子节点的 subtreeFlags
@@ -133,10 +134,13 @@ export function bubbleProperties(wip: FiberNode) {
     // 2. 收集子节点的 flags
     subtreeFlags |= child.flags;
 
+    newChildLanes = mergeLanes(newChildLanes, mergeLanes(child.lanes, child.childLanes));
+
     child.return = wip;
     // 3. 收集子节点的 flags
     child = child.sibling;
   }
 
   wip.subtreeFlags |= subtreeFlags;
+  wip.childLanes = newChildLanes;
 }

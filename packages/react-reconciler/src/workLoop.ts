@@ -37,7 +37,7 @@ function prepareFreshState(fiber: FiberRootNode, lane: Lane) {
 }
 
 export function scheduleUpdateOnFiber(fiber: FiberNode, lane: Lane) {
-  const root = markUpdateFromFiberToRoot(fiber);
+  const root = markUpdateLaneFromFiberToRoot(fiber, lane);
 
   if (!root) {
     return;
@@ -104,10 +104,15 @@ function markRootUpdated(root: FiberRootNode, lane: Lane) {
   root.pendingLanes = mergeLanes(root.pendingLanes, lane);
 }
 
-function markUpdateFromFiberToRoot(fiber: FiberNode): FiberRootNode | null {
+function markUpdateLaneFromFiberToRoot(fiber: FiberNode, lane: Lane): FiberRootNode | null {
   let node = fiber, parent = node.return;
 
   while (parent !== null) {
+    parent.childLanes = mergeLanes(parent.childLanes, lane);
+    const alternate = parent.alternate;
+    if (alternate !== null) {
+      alternate.childLanes = mergeLanes(alternate.childLanes, lane);
+    }
     node = parent;
     parent = node.return;
   }

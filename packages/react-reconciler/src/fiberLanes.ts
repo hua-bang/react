@@ -76,3 +76,11 @@ export function schedulerPriorityToLane(schedulerPriority: number) {
 export function isSubsetOfLanes(set: Lanes, subset: Lane) {
   return (set & subset) === subset;
 }
+
+export function includeSomeLanes(set: Lanes, subset: Lanes) {
+  return (set & subset) !== NoLanes;
+}
+
+export function removeLanes(set: Lanes, subset: Lanes) {
+  return set & (~subset);
+}
