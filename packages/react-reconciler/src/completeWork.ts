@@ -1,6 +1,6 @@
 import { appendInitialChild, Container, createInstance, createTextInstance, Instance } from "hostConfig";
 import { FiberNode } from "./fiber";
-import { ContextProvider, Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from "./workTags";
+import { ContextProvider, Fragment, FunctionComponent, HostComponent, HostRoot, HostText, MemoComponent } from "./workTags";
 import { NoFlags, Ref, Update } from "./fiberFlags"
 import { popProvider } from "./fiberContext";
 import { mergeLanes, NoLanes } from "./fiberLanes";
@@ -74,6 +74,9 @@ export const completeWork = (wip: FiberNode) => {
       bubbleProperties(wip);
       return null;
     case Fragment:
+      bubbleProperties(wip);
+      return null;
+    case MemoComponent:
       bubbleProperties(wip);
       return null;
     default:

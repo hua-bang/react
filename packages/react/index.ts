@@ -3,6 +3,7 @@ import currentBatchConfig from './src/currentBatchConfig';
 import { Dispatcher } from 'shared/dispatch';
 import { jsx, isValidElement as isValidElementFn } from "./src/jsx";
 export { createContext } from './src/context';
+export { memo } from './src/memo';
 
 export const useState: Dispatcher['useState'] = (initialState) => {
   const dispatcher = resolveDispatcher();
