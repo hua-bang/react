@@ -13,3 +13,7 @@ export const REACT_CONTEXT_TYPE = supportSymbol
 export const REACT_PROVIDER_TYPE = supportSymbol
   ? Symbol.for('react.provider')
   : 0xeacc;
+
+export const REACT_MEMO_TYPE = supportSymbol
+  ? Symbol.for('react.memo')
+  : 0xead3;
