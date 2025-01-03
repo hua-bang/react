@@ -7,7 +7,12 @@ import { Lane, Lanes, NoLane, NoLanes } from "./fiberLanes";
 import { Effect } from "./fiberHooks";
 import { CallbackNode } from "scheduler";
 import { REACT_MEMO_TYPE, REACT_PROVIDER_TYPE } from "shared/ReactSymbols";
+import { ContextItem } from "./fiberContext";
 
+interface FiberDependencies<Value> {
+  firstContext: ContextItem<Value> | null;
+  lanes: Lanes;
+}
 
 export class FiberNode {
   // 实例
@@ -41,6 +46,8 @@ export class FiberNode {
   flags: FiberFlags;
   subtreeFlags: FiberFlags;
 
+  dependencies: FiberDependencies<any> | null;
+
   constructor(tag: WorkTag, pendingProps: Props, key: Key) {
     // 实例
     this.tag = tag;
@@ -69,6 +76,8 @@ export class FiberNode {
 
     this.lanes = NoLane;
     this.childLanes = NoLanes;
+
+    this.dependencies = null;
   }
 }
 
@@ -133,6 +142,12 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: Props): F
 
   wip.lanes = current.lanes;
   wip.childLanes = current.childLanes;
+
+  const currentDependencies = current.dependencies;
+  wip.dependencies = currentDependencies === null ? null : {
+    firstContext: currentDependencies.firstContext,
+    lanes: currentDependencies.lanes,
+  };
 
   return wip;
 }

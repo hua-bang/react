@@ -11,6 +11,7 @@ import { FiberFlags, PassiveEffect } from './fiberFlags';
 import { HookHasEffect, Passive } from './hookEffectTags';
 import { Context } from 'shared/context';
 import { markWipeReceivedUpdate } from './beginWork';
+import { readContext as readContextOrigin } from './fiberContext';
 
 interface Hook {
   memoizedState: any;
@@ -410,15 +411,6 @@ const updateRef = <T>(_: T) => {
   return hook.memoizedState;
 }
 
-const readContext = <T>(context: Context<T>): T => {
-  const consumer = currentlyRenderingFiber;
-  if (consumer === null) {
-    throw new Error('只能在函数组件内调用useContext');
-  }
-
-  return context._currentValue;
-}
-
 const mountCallback = <T extends (...args: any[]) => any>(callback: T, deps: HookDeps | undefined) => {
   const hook = mountWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
@@ -470,6 +462,10 @@ const updateMemo = <T>(creator: () => T, deps: HookDeps | undefined) => {
 
   hook.memoizedState = [nextValue, nextDeps];
   return nextValue;
+}
+
+const readContext = <T>(context: Context<T>) => {
+  return readContextOrigin(context, currentlyRenderingFiber);
 }
 
 
