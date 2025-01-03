@@ -111,14 +111,14 @@ function updateMemoComponent(wip: FiberNode, renderLane: Lane) {
 function bailoutOnAlreadyFinishedWork(wip: FiberNode, renderLane: Lane) {
   if (!includeSomeLanes(wip.childLanes, renderLane)) {
     if (__DEV__) {
-      console.log('bailoutOn 整一颗子树', wip);
+      console.warn('bailoutOn 整一颗子树', wip);
     }
 
     return null;
   }
 
   if (__DEV__) {
-    console.log('bailoutOn 单个子节点', wip);
+    console.warn('bailoutOn 单个子节点', wip);
   }
 
   cloneChildFibers(wip);

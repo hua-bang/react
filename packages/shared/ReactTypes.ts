@@ -15,3 +15,5 @@ export interface ReactElementType {
 }
 
 export type Action<State> = State | ((prevState: State) => State);
+
+export type HookDeps = Array<any> | null;
