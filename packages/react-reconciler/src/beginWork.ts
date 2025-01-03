@@ -6,7 +6,7 @@ import { cloneChildFibers, mountChildFibers, reconcileChildFibers } from './chil
 import { bailoutHook, renderWithHooks } from './fiberHooks';
 import { includeSomeLanes, Lane, NoLanes } from './fiberLanes';
 import { Ref } from './fiberFlags';
-import { pushProvider } from './fiberContext';
+import { prepareToReadContext, propagateContextChange, pushProvider } from './fiberContext';
 import { shallowEquals } from 'shared/shallowEquals';
 
 // 是否能命中 bailout 策略
@@ -66,7 +66,7 @@ export const beginWork = (wip: FiberNode, renderLane: Lane): FiberNode | null =>
     case HostText:
       return null;
     case ContextProvider:
-      return updateContextProvider(wip);
+      return updateContextProvider(wip, renderLane);
     case FunctionComponent:
       return updateFunctionComponent(wip, wip.type, renderLane);
     case Fragment:
@@ -161,6 +161,7 @@ function updateHostComponent(wip: FiberNode) {
 }
 
 function updateFunctionComponent(wip: FiberNode, Component: FiberNode['type'], renderLane: Lane) {
+  prepareToReadContext(wip, renderLane);
   const children = renderWithHooks(wip, Component, renderLane);
   const current = wip.alternate;
   if (current !== null && !didReceiveUpdate) {
@@ -191,12 +192,23 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
   return wip.child;
 }
 
-function updateContextProvider(wip: FiberNode) {
+function updateContextProvider(wip: FiberNode, renderLane: Lane) {
   const providerType = wip.type;
   const context = providerType._context;
   const newProps = wip.pendingProps;
+  const oldProps = wip.memoizedProps;
+  const newValue = newProps.value;
 
   pushProvider(context, newProps.value);
+
+  if (oldProps !== null) {
+    const oldValue = oldProps.value;
+    if (Object.is(oldValue, newValue) && oldProps.children === newProps.children) {
+      return bailoutOnAlreadyFinishedWork(wip, renderLane);
+    } else {
+      propagateContextChange(wip, context, renderLane);
+    }
+  }
 
   const nextChildren = newProps.children;
   reconcileChildren(wip, nextChildren);
